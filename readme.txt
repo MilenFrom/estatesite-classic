@@ -4,7 +4,7 @@ Tags: real estate, property listings, blog, two-columns, right-sidebar, custom-m
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.11
+Stable tag: 1.0.12
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,12 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
+
+= 1.0.12 =
+* Fix: Footer widget areas were silently dropped. `template-parts/footer/footer.php` opens with `if (!is_active_sidebar('footer-sidebar-1') && ... ) return;` — but the v1.0.10 sidebar port missed all four `footer-sidebar-1..4` IDs. Since unregistered sidebars can never report active, the guard returned every time and the entire footer widget area was hidden, with no drop targets in Appearance → Widgets. Now registers all four with Houzez's distinct `footer-widget` before_widget class so customers can populate footer columns.
+* Fix: `sidebar-1` was registered as a "Primary Sidebar (alias)" with a comment claiming it aliased `default-sidebar`. WordPress has no sidebar aliasing — the only `sidebar.php` calls `dynamic_sidebar('default-sidebar')`, so any widget assigned to `sidebar-1` was saved + listed in the admin UI but never rendered on the front end. Dropped the alias registration. A one-time `maybe_run_migrations()` call moves any stored `sidebars_widgets['sidebar-1']` assignment into `default-sidebar` (only when the destination is empty — never overwrites).
+* Fix: Native (non-Elementor) header path rendered no menu items. Every ported Houzez header partial calls `wp_nav_menu()` with legacy Houzez slugs (`main-menu`, `main-menu-left`, `main-menu-right`, `top-menu`, `mobile-menu-hed6`, `footer-menu`), but `inc/class-theme.php::register_menus()` only registered `primary` + `footer` — so `has_nav_menu()` returned false in every partial and no menu rendered when the Elementor header was disabled. Now registers all 8 slugs (friendly: `primary`, `footer`; Houzez-compatible: the six above). Migration mirrors any existing `primary` → `main-menu` and `footer` → `footer-menu` assignment so customers don't have to re-assign in Appearance → Menus → Manage Locations.
+* Internal: All three migrations are gated by a single `estatesite_classic_migrated_v1012` option flag so they run at most once per install. Subsequent activations are no-ops.
 
 = 1.0.11 =
 * Fix: Property Cards Carousel v1 had no horizontal gutter between cards — cards rendered flush against each other instead of with breathing room. Root cause: Houzez ships ~50 bonus CSS rules in its top-level style.css that we replaced with a Phase-0 scaffold, dropping the carousel-gutter rules `.property-carousel-module .slick-slide { padding-left:10px; padding-right:10px }` + matching `.slick-list { margin-left:-10px; margin-right:-10px }`. Ported the full Houzez style.css body back into our style.css under a clearly-marked Houzez-compat layer. Also restores: slider fade-in, map markers + info windows, place autocomplete sizing, sticky-nav transitions, device-mode menu visibility, fancybox/offcanvas z-index, gallery aspect-ratio.
