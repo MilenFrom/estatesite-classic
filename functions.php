@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ESC_THEME_VERSION', '1.0.1' );
+define( 'ESC_THEME_VERSION', '1.0.2' );
 define( 'ESC_THEME_DIR',     get_template_directory() );
 define( 'ESC_THEME_URL',     get_template_directory_uri() );
 
