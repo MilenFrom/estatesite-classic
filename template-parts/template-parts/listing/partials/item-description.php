@@ -1,0 +1,1 @@
+<div class="item-short-description mb-3"><?php echo houzez_get_excerpt(12); ?></div>
