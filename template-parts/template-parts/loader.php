@@ -1,1 +1,0 @@
-<span class="houzez-loader-js houzez-hidden spinner-border spinner-border-sm" aria-hidden="true"></span>

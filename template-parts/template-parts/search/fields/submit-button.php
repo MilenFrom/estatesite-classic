@@ -1,1 +1,0 @@
-<button type="submit" class="btn btn-search btn-secondary w-100 <?php if( houzez_is_half_map() ) { echo 'half-map-search-js-btn'; }?>"><?php echo houzez_option('srh_btn_search', 'Search'); ?></button>

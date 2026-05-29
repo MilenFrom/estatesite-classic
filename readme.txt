@@ -4,7 +4,7 @@ Tags: real estate, property listings, blog, two-columns, right-sidebar, custom-m
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.10
+Stable tag: 1.0.11
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,10 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
+
+= 1.0.11 =
+* Fix: Property Cards Carousel v1 had no horizontal gutter between cards — cards rendered flush against each other instead of with breathing room. Root cause: Houzez ships ~50 bonus CSS rules in its top-level style.css that we replaced with a Phase-0 scaffold, dropping the carousel-gutter rules `.property-carousel-module .slick-slide { padding-left:10px; padding-right:10px }` + matching `.slick-list { margin-left:-10px; margin-right:-10px }`. Ported the full Houzez style.css body back into our style.css under a clearly-marked Houzez-compat layer. Also restores: slider fade-in, map markers + info windows, place autocomplete sizing, sticky-nav transitions, device-mode menu visibility, fancybox/offcanvas z-index, gallery aspect-ratio.
+* Cleanup: Removed stale `template-parts/template-parts/` duplicate subdirectory (446 files, 2.4 MB) — a v1.0.1 port artifact where rsync recursively copied template-parts into itself. Nothing referenced the nested path; file contents were byte-identical to the real `template-parts/`. Theme zip ~2.4 MB lighter.
 
 = 1.0.10 =
 * Port: 11 missing sidebars from Houzez registered in inc/class-theme.php (default-sidebar, property-listing, search-sidebar, single-property, page-sidebar, agency-sidebar, agent-sidebar, hz-mobile-menu, hz-custom-widget-area-1/2/3) plus the existing sidebar-1 alias. Without these, widget areas referenced by template files (search filter widgets, agent bio widgets, mobile menu widgets, etc.) rendered as nothing even when widget data existed in the DB. Sidebars share Houzez's `widget-wrap mb-4 p-4` markup contract so existing widget styling carries over.
