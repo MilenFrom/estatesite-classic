@@ -132,6 +132,54 @@ MANIFEST="$WORK_DIR/$PACKAGE_SLUG.json"
 ZIP_URL="$UPDATE_ENDPOINT_URL/$ZIP_NAME"
 LAST_UPDATED=$(date -u +%Y-%m-%d)
 
+# Extract the full `== Changelog ==` section from readme.txt
+# (see estatesite-wpcore/bin/release.sh for full design notes)
+CHANGELOG_TEXT=""
+if [ -f "readme.txt" ]; then
+  CHANGELOG_TEXT=$(awk '
+    BEGIN { capture=0 }
+    /^==[[:space:]]+Changelog[[:space:]]+==/ { capture=1; next }
+    /^==[[:space:]]/ { if (capture) exit }
+    capture { print }
+  ' readme.txt)
+  CHANGELOG_TEXT=$(echo "$CHANGELOG_TEXT" | awk 'NF {p=1} p' | tac | awk 'NF {p=1} p' | tac)
+fi
+if [ -z "$CHANGELOG_TEXT" ]; then
+  CHANGELOG_TEXT="See https://github.com/MilenFrom/$PACKAGE_SLUG/releases/tag/v$VERSION"
+  echo "⚠ No readme.txt Changelog section found — using fallback link"
+else
+  CL_LINES=$(echo "$CHANGELOG_TEXT" | wc -l)
+  echo "✓ Extracted $CL_LINES-line Changelog section from readme.txt"
+fi
+CHANGELOG_JSON=$(printf '%s' "$CHANGELOG_TEXT" | python3 -c '
+import sys, json, re
+text = sys.stdin.read()
+out = []
+in_list = False
+ver_heading = re.compile(r"^=[ \t]*([0-9]+\.[0-9]+\.[0-9]+(?:-[\w.]+)?)[ \t]*=[ \t]*$")
+def close_list():
+    global in_list
+    if in_list: out.append("</ul>"); in_list = False
+for line in text.split("\n"):
+    stripped = line.lstrip()
+    m = ver_heading.match(stripped)
+    if m:
+        close_list()
+        out.append(f"<h4>v{m.group(1)}</h4>")
+    elif stripped.startswith("* "):
+        if not in_list: out.append("<ul>"); in_list = True
+        item = stripped[2:]
+        item = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", item)
+        item = re.sub(r"`([^`]+)`", r"<code>\1</code>", item)
+        out.append(f"<li>{item}</li>")
+    else:
+        close_list()
+        if stripped: out.append(f"<p>{stripped}</p>")
+close_list()
+print(json.dumps("\n".join(out)))
+')
+DESCRIPTION_JSON=$(printf '%s' "$PACKAGE_DESCRIPTION" | python3 -c 'import sys, json; print(json.dumps(sys.stdin.read()))')
+
 cat > "$MANIFEST" <<JSON
 {
   "name":         "$PACKAGE_DISPLAY_NAME",
@@ -145,8 +193,8 @@ cat > "$MANIFEST" <<JSON
   "tested":       "$HEADER_TESTED",
   "last_updated": "$LAST_UPDATED",
   "sections": {
-    "description": "$PACKAGE_DESCRIPTION",
-    "changelog":   "See https://github.com/MilenFrom/$PACKAGE_SLUG/releases/tag/v$VERSION"
+    "description": $DESCRIPTION_JSON,
+    "changelog":   $CHANGELOG_JSON
   }
 }
 JSON
