@@ -9,7 +9,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ESC_THEME_VERSION', '1.0.3' );
+define( 'ESC_THEME_VERSION', '1.0.4' );
 define( 'ESC_THEME_DIR',     get_template_directory() );
 define( 'ESC_THEME_URL',     get_template_directory_uri() );
 
@@ -24,7 +24,7 @@ add_action( 'after_setup_theme', static function () {
 	if ( ! class_exists( '\EstateSite\Core\Update_Checker' ) ) {
 		return; // Core missing — theme dep check below will surface this.
 	}
-	new \EstateSite\Core\Update_Checker(
+	$checker = new \EstateSite\Core\Update_Checker(
 		'theme',
 		'estatesite-classic', // theme slug = directory name
 		ESC_THEME_VERSION,
@@ -32,6 +32,15 @@ add_action( 'after_setup_theme', static function () {
 			? ESTATESITE_UPDATE_ENDPOINT_CLASSIC
 			: 'https://dev.estatesite.eu/updates/estatesite-classic.json'
 	);
+
+	// Theme-side UI (theme card "Check for updates" link + Theme Details
+	// overlay Changelog block). These used to live inside Update_Checker
+	// itself but presentation belongs in the theme — Core only owns the
+	// generic update infrastructure.
+	if ( is_admin() ) {
+		require_once ESC_THEME_DIR . '/inc/class-update-ui.php';
+		new \EstateSite\Classic\Update_UI( $checker );
+	}
 } );
 
 /*

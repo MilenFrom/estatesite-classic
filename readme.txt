@@ -4,7 +4,7 @@ Tags: real estate, property listings, blog, two-columns, right-sidebar, custom-m
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,9 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
+
+= 1.0.4 =
+* New: Theme owns its own admin UI for the update system. inc/class-update-ui.php renders the "Check for updates" link on the theme card (Appearance → Themes) and adds a collapsible Changelog section to WP's Theme Details overlay. Reads data via Core's new manifest() and get_force_check_url() public API rather than having Core inject the markup itself. Pairs with estatesite-wpcore v1.0.7 which strips the theme-specific code out of Update_Checker.
 
 = 1.0.3 =
 * Fix: Update_Checker hook timing. functions.php registered Update_Checker on plugins_loaded — but themes load AFTER plugins_loaded fires, so the add_action was registering a callback for an action that already passed. Theme's site_transient_update_themes filter was never registered either, which is why customers never saw theme update notifications. Switched to after_setup_theme. After this fix: theme update notifications work, and the "Check for updates" link on the theme card appears.
