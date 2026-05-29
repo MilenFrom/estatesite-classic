@@ -95,14 +95,98 @@ final class Theme {
 	}
 
 	public function register_sidebars(): void {
-		register_sidebar( [
-			'name'          => __( 'Primary Sidebar', 'estatesite-classic' ),
-			'id'            => 'sidebar-1',
-			'description'   => __( 'Default sidebar shown in blog posts and pages.', 'estatesite-classic' ),
-			'before_widget' => '<section id="%1$s" class="widget %2$s">',
-			'after_widget'  => '</section>',
-			'before_title'  => '<h3 class="widget-title">',
-			'after_title'   => '</h3>',
-		] );
+		// Sidebars ported from Houzez functions.php to match the IDs the
+		// theme's template files reference (single-property, search-sidebar,
+		// agent-sidebar, etc.). Without these, widget areas that used to
+		// hold listing-filter widgets, agent-bio widgets, etc. show empty
+		// even though widget data is still in the DB.
+		//
+		// All sidebars share the same Houzez markup contract:
+		//   <div class="widget widget-wrap mb-4 p-4 widget_xxx">
+		//     <div class="widget-header"><h3 class="widget-title">Title</h3></div>
+		//     ...widget content...
+		//   </div>
+		// so existing widget styling carries over.
+		$shared = [
+			'before_widget' => '<div id="%1$s" class="widget widget-wrap mb-4 p-4 %2$s">',
+			'after_widget'  => '</div>',
+			'before_title'  => '<div class="widget-header"><h3 class="widget-title mb-4">',
+			'after_title'   => '</h3></div>',
+		];
+
+		$sidebars = [
+			[
+				'name'        => __( 'Default Sidebar', 'estatesite-classic' ),
+				'id'          => 'default-sidebar',
+				'description' => __( 'Widgets shown in the blog sidebar.', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Property Listings', 'estatesite-classic' ),
+				'id'          => 'property-listing',
+				'description' => __( 'Widgets shown in the property listings sidebar (archive / listing-grid page templates).', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Search Sidebar', 'estatesite-classic' ),
+				'id'          => 'search-sidebar',
+				'description' => __( 'Widgets shown on the search results page.', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Single Property', 'estatesite-classic' ),
+				'id'          => 'single-property',
+				'description' => __( 'Widgets shown in the single property sidebar.', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Page Sidebar', 'estatesite-classic' ),
+				'id'          => 'page-sidebar',
+				'description' => __( 'Widgets shown in the page sidebar (regular pages with sidebar layout).', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Agency Sidebar', 'estatesite-classic' ),
+				'id'          => 'agency-sidebar',
+				'description' => __( 'Widgets shown on agency archive + single agency pages.', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Agent Sidebar', 'estatesite-classic' ),
+				'id'          => 'agent-sidebar',
+				'description' => __( 'Widgets shown on agent archive + single agent pages.', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Mobile Menu', 'estatesite-classic' ),
+				'id'          => 'hz-mobile-menu',
+				'description' => __( 'Widgets shown in the mobile menu drawer.', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Custom Widget Area 1', 'estatesite-classic' ),
+				'id'          => 'hz-custom-widget-area-1',
+				'description' => __( 'Assignable to any page via widget settings.', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Custom Widget Area 2', 'estatesite-classic' ),
+				'id'          => 'hz-custom-widget-area-2',
+				'description' => __( 'Assignable to any page via widget settings.', 'estatesite-classic' ),
+			],
+			[
+				'name'        => __( 'Custom Widget Area 3', 'estatesite-classic' ),
+				'id'          => 'hz-custom-widget-area-3',
+				'description' => __( 'Assignable to any page via widget settings.', 'estatesite-classic' ),
+			],
+		];
+
+		foreach ( $sidebars as $sb ) {
+			register_sidebar( array_merge( $sb, $shared ) );
+		}
+
+		// Backwards-compat alias: WP's default theme scaffold uses 'sidebar-1'
+		// for the primary sidebar. Houzez uses 'default-sidebar'. Register
+		// 'sidebar-1' as an alias so any pre-existing widget assignments to it
+		// continue to render.
+		register_sidebar( array_merge(
+			[
+				'name'        => __( 'Primary Sidebar (alias)', 'estatesite-classic' ),
+				'id'          => 'sidebar-1',
+				'description' => __( 'WP scaffold alias for default-sidebar.', 'estatesite-classic' ),
+			],
+			$shared
+		) );
 	}
 }

@@ -4,7 +4,7 @@ Tags: real estate, property listings, blog, two-columns, right-sidebar, custom-m
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.9
+Stable tag: 1.0.10
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,9 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
+
+= 1.0.10 =
+* Port: 11 missing sidebars from Houzez registered in inc/class-theme.php (default-sidebar, property-listing, search-sidebar, single-property, page-sidebar, agency-sidebar, agent-sidebar, hz-mobile-menu, hz-custom-widget-area-1/2/3) plus the existing sidebar-1 alias. Without these, widget areas referenced by template files (search filter widgets, agent bio widgets, mobile menu widgets, etc.) rendered as nothing even when widget data existed in the DB. Sidebars share Houzez's `widget-wrap mb-4 p-4` markup contract so existing widget styling carries over.
 
 = 1.0.9 =
 * Remove: Changelog `<details>` block experiment removed entirely. Across v1.0.4 → v1.0.8 each fix to the WP-DOM gate introduced a new edge case in another container variant. The feature wasn't worth the maintenance — customers can read changelogs at https://github.com/MilenFrom/estatesite-classic/releases or via the manifest JSON at https://dev.estatesite.eu/updates/estatesite-classic.json. inc/class-update-ui.php now only injects the "Check for updates" link (the actionable part) and is half the size.
