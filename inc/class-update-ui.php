@@ -68,21 +68,8 @@ final class Update_UI {
 		$changelog_label_json = wp_json_encode( __( 'Changelog', 'estatesite-classic' ) );
 		?>
 		<style>
-			/* Theme card link. Lives inside .theme-actions (dark footer on the
-			   active theme card, light row on inactive cards). Float right so
-			   it sits opposite the Customize/Activate button. */
-			.theme[data-slug="<?php echo esc_attr( $slug ); ?>"] .theme-actions .esc-check-updates {
-				float: right;
-				margin-top: 8px;
-				margin-right: 12px;
-				font-size: 13px;
-				color: #72aee6;
-				text-decoration: underline;
-			}
-			.theme[data-slug="<?php echo esc_attr( $slug ); ?>"] .theme-actions .esc-check-updates:hover {
-				color: #fff;
-			}
-			/* Theme overlay / single-theme view link. Lives next to the h2 name. */
+			/* Theme Details view link — sits next to the h2 .theme-name in any
+			   of WP's three layouts for that view. */
 			.theme-overlay .theme-info .theme-name .esc-check-updates,
 			.single-theme .theme-info .theme-name .esc-check-updates,
 			.theme-wrap .theme-info .theme-name .esc-check-updates {
@@ -151,17 +138,10 @@ final class Update_UI {
 				return link;
 			}
 
-			function injectIntoCard(card) {
-				if (!card || card.querySelector('.esc-check-updates')) return;
-				// Mount inside the .theme-actions row (sits next to Customize/
-				// Live Preview/Activate). On the active theme's card this row
-				// IS the dark footer bar — the link is styled to read as a
-				// secondary action there.
-				var mount = card.querySelector('.theme-actions') ||
-				            card.querySelector('.theme-name') ||
-				            card;
-				mount.appendChild(makeLink());
-			}
+			// (Theme card injection deliberately omitted. The link is shown only
+			// inside the Theme Details view — the card footer is reserved for
+			// WP's own actions (Customize / Activate / Live Preview) to keep
+			// the layout uncluttered.)
 
 			function injectIntoModal() {
 				// WP renders the "Theme Details" view in two slightly different
@@ -218,10 +198,7 @@ final class Update_UI {
 			}
 
 			function tryNow() {
-				var card = document.querySelector('.theme[data-slug="' + slug + '"]');
-				if (card) injectIntoCard(card);
 				injectIntoModal();
-				return !!card;
 			}
 
 			if (document.readyState !== 'loading') tryNow();

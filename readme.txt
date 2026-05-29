@@ -4,7 +4,7 @@ Tags: real estate, property listings, blog, two-columns, right-sidebar, custom-m
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,9 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
+
+= 1.0.6 =
+* Remove: "Check for updates" link no longer appears on the theme card footer. The card footer is reserved for WP's own actions (Customize / Activate / Live Preview) — adding our link there crowded the layout. The link now only appears inside the Theme Details view (next to the theme name), which is where it belongs alongside the version + author + description.
 
 = 1.0.5 =
 * Fix: "Check for updates" link wasn't appearing in the Theme Details view. The injection JS was looking only for `.theme-overlay` (the modal overlay rendered over the grid), but WP sometimes renders the same template under `.single-theme` or `.theme-wrap` in a full-page layout — those weren't matched.
