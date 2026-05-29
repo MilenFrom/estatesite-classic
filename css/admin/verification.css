@@ -1,0 +1,545 @@
+/**
+ * Houzez Admin Verification Requests Styles
+ */
+
+/* Filter styles */
+.filter-form {
+    display: flex;
+    align-items: center;
+}
+
+.hz-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+.filter-label {
+    font-weight: 500;
+}
+
+.filter-select {
+    min-width: 200px;
+}
+
+/* Table styles */
+.verification-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.verification-table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e2e4e7;
+    padding: 10px;
+}
+
+.verification-table td {
+    border-bottom: 1px solid #e2e4e7;
+    padding: 12px 10px;
+    vertical-align: top;
+}
+
+.verification-table tr:last-child td {
+    border-bottom: none;
+}
+
+.verification-table tr:hover td {
+    background-color: #f5f7f9;
+}
+
+/* No items message */
+.no-items-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    color: #666;
+}
+
+.no-items-message .dashicons {
+    font-size: 24px;
+    margin-right: 10px;
+    color: #007cba;
+}
+
+.no-items-message p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* User column */
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-info img {
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: 0.5px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.status-pending {
+    background-color: #f0ad4e;
+}
+
+.status-approved {
+    background-color: #5cb85c;
+}
+
+.status-rejected {
+    background-color: #d9534f;
+}
+
+.status-additional-info {
+    background-color: #5bc0de;
+}
+
+/* Document section */
+.document-info {
+    margin-bottom: 10px;
+}
+
+.document-type {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.document-links {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.document-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #007cba;
+    background: #f5f5f5;
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-size: 12px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 3px;
+}
+
+.document-link .dashicons {
+    font-size: 16px;
+    margin-right: 4px;
+    color: #2271b1;
+}
+
+.document-link:hover {
+    background: #f0f0f0;
+    color: #135e96;
+    border-color: #c7c7c7;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Additional document */
+.additional-document {
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    border-left: 3px solid #007cba;
+}
+
+.additional-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.additional-header .dashicons {
+    margin-right: 5px;
+    color: #007cba;
+}
+
+.additional-notes {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #ddd;
+}
+
+.additional-notes p {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.additional-info-date {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #666;
+}
+
+.additional-info-date .dashicons {
+    font-size: 14px;
+    margin-right: 3px;
+}
+
+/* Date column */
+.date-wrapper {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.date-wrapper.hz-updated {
+    color: #007cba;
+}
+
+.date-wrapper .dashicons {
+    margin-right: 5px;
+    font-size: 16px;
+    line-height: 1.4;
+    padding-top: 2px;
+}
+
+.date-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-label {
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 1px;
+    display: block;
+}
+
+.date-value {
+    font-size: 12px;
+    display: block;
+}
+
+.date-wrapper.original {
+    opacity: 0.7;
+}
+
+/* Action buttons */
+.request-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.button-reject {
+    color: #d63638;
+    border-color: #d63638;
+}
+
+.button-reject:hover {
+    background: #d63638;
+    color: white;
+}
+
+.button-info {
+    color: #2271b1;
+    border-color: #2271b1;
+}
+
+.button-info:hover {
+    background: #2271b1;
+    color: white;
+}
+
+.button .dashicons {
+    font-size: 16px;
+    vertical-align: text-top;
+    margin-right: 4px;
+    height: 16px;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    min-height: 32px;
+    padding: 4px 12px;
+    transition: all 0.2s ease;
+}
+
+/* Fix recent submission style */
+tr.recent-submission td {
+    background-color: #fcf9e8;
+}
+
+tr.has-additional-info td {
+    background-color: #f0f7fb;
+}
+
+tr.has-additional-info.recent-submission td {
+    background: linear-gradient(45deg, #fcf9e8 50%, #f0f7fb 50%);
+}
+
+/* Additional info icon */
+.additional-info-icon {
+    color: #007cba;
+    vertical-align: middle;
+    margin-left: 5px;
+    font-size: 18px !important;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Modal styles */
+.houzez-modal {
+    position: fixed;
+    z-index: 100000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.houzez-modal-content {
+    background-color: #fff;
+    width: 500px;
+    max-width: 90%;
+    border-radius: 6px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.houzez-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e2e4e7;
+}
+
+.houzez-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.houzez-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.houzez-modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e2e4e7;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.close {
+    color: #aaa;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close:hover,
+.close:focus {
+    color: #333;
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group .description {
+    color: #666;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.rejection-reason,
+.additional-info-request {
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    font-size: 12px;
+    border-left: 3px solid #d9534f;
+}
+
+.additional-info-request {
+    border-left-color: #5bc0de;
+}
+
+/* Button animations */
+@keyframes pulse-animation {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pulse-animation {
+    animation: pulse-animation 0.5s ease;
+}
+
+/* Processing state */
+.button-state-processing {
+    opacity: 0.8;
+    position: relative;
+}
+
+.processing-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s linear infinite;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.button-state-success {
+    background-color: #46b450 !important;
+    border-color: #46b450 !important;
+    color: #fff !important;
+}
+
+.button-state-error {
+    background-color: #dc3232 !important;
+    border-color: #dc3232 !important;
+    color: #fff !important;
+}
+
+.processing-row {
+    background-color: #f9f9f9 !important;
+    transition: background-color 0.3s ease;
+}
+
+.update-success {
+    background-color: #f0fff0 !important;
+    transition: background-color 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    .stat-box {
+        min-width: 100px;
+    }
+
+    .verification-table .column-document,
+    .verification-table .column-date {
+        display: none;
+    }
+
+    .verification-table .column-status,
+    .verification-table .column-actions {
+        display: table-cell;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .wp-admin.admin-color-light .stat-box {
+        background: #1f2329;
+        border-color: #353a43;
+    }
+
+    .wp-admin.admin-color-light .stat-box a {
+        color: #e6e6e6;
+    }
+
+    .wp-admin.admin-color-light .additional-document {
+        background-color: #23282d;
+    }
+
+    .wp-admin.admin-color-light .houzez-modal-content {
+        background-color: #1f2329;
+    }
+}
+
+/* Hide WordPress update notifications in this admin page */
+.wrap > .updated:not(.notice),
+.wrap > .update-nag {
+    display: none !important;
+}
+
+/* Fix admin notice styling conflicts */
+#wpcontent .notice {
+    margin: 5px 15px 2px;
+}

@@ -1,0 +1,145 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  # -------------------------------------------------------------------------
+  # PHP lint — runs on every push and PR. Catches syntax errors before merge.
+  # -------------------------------------------------------------------------
+  lint:
+    name: PHP syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 7.4 (lowest supported)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          tools: none
+
+      - name: php -l all PHP files
+        shell: bash
+        run: |
+          find . -name '*.php' \
+            -not -path './vendor/*' \
+            -not -path './node_modules/*' \
+            -not -path './.git/*' \
+            -print0 \
+          | xargs -0 -n1 -P4 php -l \
+          | grep -v "^No syntax errors" \
+          | tee lint_errors.txt
+          if [ -s lint_errors.txt ]; then
+            echo "❌ PHP syntax errors found"
+            exit 1
+          fi
+
+  # -------------------------------------------------------------------------
+  # Version consistency — theme Version: in style.css must match the tag.
+  # -------------------------------------------------------------------------
+  version-consistency:
+    name: Version consistency
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Compare style.css Version: vs tag"
+        shell: bash
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          THEME_VERSION=$(grep -m1 '^[[:space:]]*Version:' style.css | sed -E 's/.*Version:[[:space:]]+//' | xargs)
+          echo "Tag: $TAG_VERSION"
+          echo "Theme Version: $THEME_VERSION"
+          if [ "$TAG_VERSION" != "$THEME_VERSION" ]; then
+            echo "❌ Tag v$TAG_VERSION but style.css Version: $THEME_VERSION — bump style.css before tagging"
+            exit 1
+          fi
+
+  # -------------------------------------------------------------------------
+  # Release build — runs only on version tags.
+  # -------------------------------------------------------------------------
+  release:
+    name: Build release zip
+    needs: [lint, version-consistency]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build dist zip
+        shell: bash
+        run: |
+          SLUG="estatesite-classic"
+          VERSION="${GITHUB_REF_NAME#v}"
+          DIST="$SLUG"
+
+          mkdir -p "../$DIST"
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='.gitattributes' \
+            --exclude='.editorconfig' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='phpunit.xml*' \
+            --exclude='phpcs.xml*' \
+            --exclude='composer.lock' \
+            --exclude='*.log' \
+            --exclude='.DS_Store' \
+            --exclude='Thumbs.db' \
+            --exclude='RELEASE_NOTES_v*.md' \
+            ./ "../$DIST/"
+
+          cd ..
+          zip -r "${SLUG}-${VERSION}.zip" "$DIST" -q
+          ls -la "${SLUG}-${VERSION}.zip"
+          mv "${SLUG}-${VERSION}.zip" "$GITHUB_WORKSPACE/"
+
+      - name: Build update manifest (JSON)
+        shell: bash
+        run: |
+          SLUG="estatesite-classic"
+          VERSION="${GITHUB_REF_NAME#v}"
+          ZIP_URL="https://github.com/${{ github.repository }}/releases/download/${GITHUB_REF_NAME}/${SLUG}-${VERSION}.zip"
+
+          # Theme metadata lives in style.css headers.
+          REQUIRES=$(grep -m1 '^[[:space:]]*Requires at least:' style.css | sed -E 's/.*Requires at least:[[:space:]]+//' | xargs || echo "")
+          REQUIRES_PHP=$(grep -m1 '^[[:space:]]*Requires PHP:' style.css | sed -E 's/.*Requires PHP:[[:space:]]+//' | xargs || echo "")
+
+          cat > "${SLUG}.json" <<JSON
+          {
+            "name":         "EstateSite Classic",
+            "slug":         "${SLUG}",
+            "version":      "${VERSION}",
+            "download_url": "${ZIP_URL}",
+            "homepage":     "https://estatesite.eu",
+            "author":       "Estate Site",
+            "requires":     "${REQUIRES}",
+            "requires_php": "${REQUIRES_PHP}",
+            "last_updated": "$(date -u +%Y-%m-%d)",
+            "sections": {
+              "description": "EstateSite Classic — real-estate WordPress theme.",
+              "changelog":   "See https://github.com/${{ github.repository }}/releases/tag/${GITHUB_REF_NAME}"
+            }
+          }
+          JSON
+          cat "${SLUG}.json"
+
+      - name: Create GitHub Release with zip + manifest assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            estatesite-classic-*.zip
+            estatesite-classic.json
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: true

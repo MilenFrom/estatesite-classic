@@ -1,0 +1,328 @@
+@media screen and (min-width: 1400px) {
+}
+
+@media screen and (max-width: 1365px) {
+    .stats-box {
+        padding: 18px;
+    }
+    .stats-box .media p {
+        font-size: 14px;
+    }
+    .houzez-data-table table tbody tr td,
+    .houzez-data-table table thead tr th {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+@media screen and (max-width: 1199px) {
+    .header {
+        padding: 0 16px;
+    }
+    .dashboard-sidebar {
+        z-index: 10;
+        transform: translateX(100%);
+    }
+    .dashboard-right {
+        margin: 0;
+    }
+    .header-left ul {
+        gap: 16px;
+    }
+    .sidebar-collapsed .dashboard-sidebar {
+        transform: translateX(0);
+    }
+    .houzez-data-table table tbody tr td,
+    .houzez-data-table table thead tr th {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .propertie-list {
+        overflow-y: auto;
+    }
+    .propertie-list ul {
+        width: 900px;
+    }
+    .lead-filter form {
+        flex-direction: column;
+        align-items: self-start;
+    }
+    .lead-filter .filter-right {
+        width: 100%;
+    }
+    .lead-filter .filter-right .relative {
+        width: 100%;
+    }
+    .lead-filter .filter-right .form-control {
+        width: 100%;
+    }
+    .lead-filter .add-export-btn {
+        margin-bottom: 20px;
+    }
+    .houzez-inquiry {
+        flex-direction: column;
+    }
+    .inquiry-detail {
+        max-width: 100%;
+    }
+}
+@media screen and (max-width: 767px) {
+    .user-dropdown span {
+        display: none;
+    }
+    .user-dropdown i {
+        margin-right: 4px;
+    }
+    .houzez-data-table table tbody tr td .image-holder {
+        width: 75px;
+    }
+    .houzez-data-table table tbody tr td .text-box h4 a {
+        font-size: 12px;
+        line-height: 18px;
+    }
+    .houzez-data-table table tbody tr td .text-box address {
+        font-size: 10px;
+        line-height: 14px;
+    }
+    .status {
+        height: 20px;
+        font-size: 10px;
+        padding: 0 6px;
+    }
+    .houzez-table-filters form {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .filter-left {
+        width: 100%;
+    }
+    .filter-left .form-control {
+        width: 100%;
+        height: 38px;
+    }
+    .filter-right {
+        margin-right: 0;
+        width: 100%;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .filter-right .relative {
+        flex: 1;
+        width: 100%;
+    }
+    .filter-right .form-control {
+        width: 100%;
+    }
+    .filter-right .dropdown {
+        width: 100%;
+    }
+    .fiter-btn {
+        width: 100%;
+    }
+    .houzez-sorting {
+        gap: 20px;
+        flex-direction: column;
+    }
+    .lead-filter .btn-primary {
+        width: 100%;
+    }
+    .lead-filter .add-export-btn {
+        margin-bottom: 0;
+    }
+    .lead-filter .add-export-btn ul {
+        flex-wrap: wrap;
+    }
+    .lead-filter .add-export-btn ul li {
+        width: 48%;
+    }
+    .houzez-invoice-filter form {
+        grid-template-columns: 6fr 6fr;
+    }
+    .modal-dialog {
+        max-width: 95%;
+        margin: 0 auto;
+    }
+}
+
+@media screen and (max-width: 575px) {
+    .stats-box {
+        padding: 24px;
+    }
+    .stats-box .media p {
+        font-size: 16px;
+    }
+
+    .heading .heading-text h2 {
+        font-size: 20px;
+    }
+    .result-fund p {
+        font-size: 12px;
+    }
+    .houzez-invoice-filter form {
+        grid-template-columns: 12fr;
+    }
+    .heading .heading-text p {
+        font-size: 12px;
+    }
+    .houzez-invoice-filter {
+        padding: 16px;
+    }
+    .membership-inner h4 {
+        font-size: 16px;
+    }
+    .membership-inner span {
+        padding: 3px 10px;
+        font-size: 12px;
+        height: 25px;
+    }
+    .houzez-membership ul li {
+        font-size: 14px;
+    }
+    .houzez-data-table table tbody tr td .text-box h5 {
+        font-size: 12px;
+    }
+    .time-span {
+        font-size: 12px;
+        margin-bottom: 6px;
+        margin-top: 8px;
+    }
+    .houzez-data-table table tbody tr td .text-box ul li {
+        font-size: 11px;
+        margin-bottom: 4px;
+    }
+    .modal-header {
+        padding: 16px;
+    }
+    .modal-body {
+        padding: 16px;
+    }
+    .modal-list h4 {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+    .modal-list p {
+        font-size: 12px;
+    }
+    .modal-head address {
+        font-size: 12px;
+        line-height: 18px;
+    }
+    .invoice-bill p {
+        font-size: 12px;
+        margin-bottom: 1px;
+    }
+    .invoice-bill {
+        margin-bottom: 20px;
+    }
+    .invoice-description {
+        margin: 20px 0 0 0;
+    }
+    .modal-footer {
+        padding: 16px;
+    }
+    .modal-footer .add-export-btn ul {
+        flex-wrap: wrap;
+    }
+    .modal-dialog {
+        height: 90%;
+        margin: 30px auto 0;
+    }
+    /******** MESSAGE PAGE *******/
+    .houzez-message-box .heading {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .houzez-message-box {
+        padding: 16px;
+    }
+    .customer-replay-box {
+        padding: 10px;
+    }
+    .customer-replay-detail {
+        gap: 10px;
+    }
+    .customer-image {
+        width: 34px;
+        height: 34px;
+    }
+    .customer-message {
+        gap: 8px;
+        margin-top: 20px;
+    }
+    .customer-message .text-box h4 {
+        font-size: 14px;
+    }
+    .customer-box-right h4 {
+        font-size: 12px;
+    }
+    .customer-replay-detail .form-control {
+        padding: 10px;
+        height: 100px;
+        font-size: 12px;
+        margin: 10px 0 10px;
+    }
+    .customer-box-right span {
+        font-size: 10px;
+    }
+    .customer-box-right p {
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    .customer-image i {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 370px) {
+}
+
+@media (max-width: 991.98px) {
+    .table-responsive .table thead,
+    .table-responsive .table tbody,
+    .table-responsive .table th,
+    .table-responsive .table td,
+    .table-responsive .table tr {
+        display: block;
+    }
+}
+@media (max-width: 991.98px) {
+    .table-responsive .table thead tr {
+        position: absolute;
+        top: -9999px;
+        right: -9999px;
+    }
+}
+@media (max-width: 991.98px) {
+    .table-responsive .table tr {
+        margin-bottom: 20px;
+    }
+}
+.table-responsive .table td {
+    vertical-align: middle;
+}
+@media (max-width: 991.98px) {
+    .table-responsive .table td {
+        position: relative;
+        padding-right: 40% !important;
+    }
+}
+@media (max-width: 991.98px) {
+    .table-responsive .table td:last-of-type {
+        border-bottom: none;
+    }
+}
+@media (max-width: 991.98px) {
+    .table-responsive .table td:before {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        width: 40%;
+        white-space: nowrap;
+        font-weight: 700;
+        content: attr(data-label);
+        text-align: right;
+    }
+}

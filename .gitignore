@@ -1,0 +1,28 @@
+# Development artifacts (kept locally only)
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Build / dependency dirs we don't commit
+node_modules/
+vendor/
+composer.lock
+
+# WordPress export artifacts
+*.zip
+*.tar
+*.tar.gz
+
+# Local config that should never reach the repo
+.env
+.env.local
+wp-config-local.php
+
+# IDE / editor temporary files
+*.orig
+*.rej
