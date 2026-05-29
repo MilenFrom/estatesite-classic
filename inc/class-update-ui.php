@@ -51,38 +51,53 @@ final class Update_UI {
 		$manifest        = $this->checker->manifest();
 		$changelog_html  = $manifest['sections']['changelog'] ?? '';
 
+		// Theme name from style.css — used by the single-theme view injection
+		// to identify our theme by matching the .theme-name h2 text (that view
+		// doesn't carry a data-slug attribute).
+		$theme           = wp_get_theme( $slug );
+		$theme_name      = $theme->get( 'Name' );
+
 		// All values that flow into JS string literals go through wp_json_encode
 		// so the embedded URL keeps real ampersands (esc_js HTML-encodes them
 		// to &amp;, which breaks the nonce on click).
 		$slug_json            = wp_json_encode( $slug );
+		$name_json            = wp_json_encode( $theme_name );
 		$href_json            = wp_json_encode( $href );
 		$label_json           = wp_json_encode( __( 'Check for updates', 'estatesite-classic' ) );
 		$changelog_json       = wp_json_encode( $changelog_html );
 		$changelog_label_json = wp_json_encode( __( 'Changelog', 'estatesite-classic' ) );
 		?>
 		<style>
-			.theme[data-slug="<?php echo esc_attr( $slug ); ?>"] .esc-check-updates {
-				display: inline-block;
-				margin-top: 4px;
-				color: #2271b1;
-				text-decoration: none;
+			/* Theme card link. Lives inside .theme-actions (dark footer on the
+			   active theme card, light row on inactive cards). Float right so
+			   it sits opposite the Customize/Activate button. */
+			.theme[data-slug="<?php echo esc_attr( $slug ); ?>"] .theme-actions .esc-check-updates {
+				float: right;
+				margin-top: 8px;
+				margin-right: 12px;
 				font-size: 13px;
-			}
-			.theme[data-slug="<?php echo esc_attr( $slug ); ?>"] .esc-check-updates:hover {
-				color: #135e96;
+				color: #72aee6;
 				text-decoration: underline;
 			}
-			.theme-overlay .theme-info .esc-check-updates {
+			.theme[data-slug="<?php echo esc_attr( $slug ); ?>"] .theme-actions .esc-check-updates:hover {
+				color: #fff;
+			}
+			/* Theme overlay / single-theme view link. Lives next to the h2 name. */
+			.theme-overlay .theme-info .theme-name .esc-check-updates,
+			.single-theme .theme-info .theme-name .esc-check-updates,
+			.theme-wrap .theme-info .theme-name .esc-check-updates {
 				display: inline-block;
 				margin-left: 12px;
 				font-size: 13px;
+				font-weight: normal;
 				color: #2271b1;
-				text-decoration: none;
+				text-decoration: underline;
 				vertical-align: middle;
 			}
-			.theme-overlay .theme-info .esc-check-updates:hover {
+			.theme-overlay .theme-info .theme-name .esc-check-updates:hover,
+			.single-theme .theme-info .theme-name .esc-check-updates:hover,
+			.theme-wrap .theme-info .theme-name .esc-check-updates:hover {
 				color: #135e96;
-				text-decoration: underline;
 			}
 			.esc-theme-changelog {
 				margin-top: 24px;
@@ -122,6 +137,7 @@ final class Update_UI {
 		<script>
 		(function () {
 			var slug           = <?php echo $slug_json; ?>;
+			var themeName      = <?php echo $name_json; ?>;
 			var href           = <?php echo $href_json; ?>;
 			var label          = <?php echo $label_json; ?>;
 			var changelogHtml  = <?php echo $changelog_json; ?>;
@@ -137,35 +153,57 @@ final class Update_UI {
 
 			function injectIntoCard(card) {
 				if (!card || card.querySelector('.esc-check-updates')) return;
+				// Mount inside the .theme-actions row (sits next to Customize/
+				// Live Preview/Activate). On the active theme's card this row
+				// IS the dark footer bar — the link is styled to read as a
+				// secondary action there.
 				var mount = card.querySelector('.theme-actions') ||
 				            card.querySelector('.theme-name') ||
-				            card.querySelector('.theme-author') ||
 				            card;
 				mount.appendChild(makeLink());
 			}
 
 			function injectIntoModal() {
-				var overlay = document.querySelector('.theme-overlay');
-				if (!overlay) return;
-				var displayed = document.querySelector('.theme.displaying-theme');
-				if (!displayed) return;
-				if (displayed.getAttribute('data-slug') !== slug) return;
+				// WP renders the "Theme Details" view in two slightly different
+				// layouts depending on flow:
+				//   - `.theme-overlay`           — modal overlay over the grid
+				//                                  (click "Theme Details" on a card)
+				//   - `.themes.single-theme`     — full-page replacement when the
+				//                                  grid is filtered to one theme
+				//
+				// Both render the same Backbone template (tmpl-theme-single) with
+				// .theme-info containing .theme-name, so we look up the rendered
+				// view as a single root then identify our theme by matching the
+				// name in the .theme-name <h2> (the active theme's data-slug
+				// attribute isn't on this view).
+				var roots = document.querySelectorAll('.theme-overlay, .single-theme, .theme-wrap');
+				for (var i = 0; i < roots.length; i++) {
+					tryInjectInfo(roots[i]);
+				}
+			}
 
-				var info = overlay.querySelector('.theme-info');
+			function tryInjectInfo(root) {
+				if (!root) return;
+				var info = root.querySelector('.theme-info');
 				if (!info) return;
+				// Only inject when this view is showing OUR theme. The view
+				// doesn't carry a data-slug, so we match against the h2.theme-name
+				// text content (stripped of "Active:" / "Version: x.y.z" labels).
+				var nameEl = info.querySelector('.theme-name');
+				if (!nameEl) return;
+				var nameText = nameEl.textContent
+					.replace(/Active:\s*/, '')
+					.replace(/Version:\s*\S+\s*$/, '')
+					.trim();
+				if (nameText.toLowerCase() !== themeName.toLowerCase()) return;
 
-				// 1. "Check for updates" link next to theme-name
-				if (!overlay.querySelector('.esc-check-updates')) {
-					var nameEl = info.querySelector('.theme-name');
-					if (nameEl) {
-						nameEl.appendChild(makeLink());
-					} else {
-						info.appendChild(makeLink());
-					}
+				// 1. "Check for updates" link next to .theme-name
+				if (!root.querySelector('.esc-check-updates')) {
+					nameEl.appendChild(makeLink());
 				}
 
-				// 2. Collapsible Changelog block at the bottom of .theme-info.
-				if (changelogHtml && !overlay.querySelector('.esc-theme-changelog')) {
+				// 2. Collapsible Changelog <details> at the bottom of .theme-info
+				if (changelogHtml && !root.querySelector('.esc-theme-changelog')) {
 					var details = document.createElement('details');
 					details.className = 'esc-theme-changelog';
 					var summary = document.createElement('summary');
@@ -190,11 +228,12 @@ final class Update_UI {
 			else document.addEventListener('DOMContentLoaded', tryNow);
 			window.addEventListener('load', tryNow);
 
+			// Observe the entire body for DOM changes. When the user clicks
+			// "Theme Details" on a card, WP injects the .theme-wrap markup
+			// somewhere under .wrap (or directly under body for the overlay),
+			// not necessarily inside .themes. Watching body catches both.
 			var observer = new MutationObserver(function () { tryNow(); });
-			var themes = document.querySelector('.themes') || document.body;
-			if (themes) {
-				observer.observe(themes, { childList: true, subtree: true });
-			}
+			observer.observe(document.body, { childList: true, subtree: true });
 		})();
 		</script>
 		<?php

@@ -4,7 +4,7 @@ Tags: real estate, property listings, blog, two-columns, right-sidebar, custom-m
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,12 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
+
+= 1.0.5 =
+* Fix: "Check for updates" link wasn't appearing in the Theme Details view. The injection JS was looking only for `.theme-overlay` (the modal overlay rendered over the grid), but WP sometimes renders the same template under `.single-theme` or `.theme-wrap` in a full-page layout — those weren't matched.
+* Fix: MutationObserver was watching `.themes` (the grid container), but WP injects the Theme Details markup OUTSIDE that container in some flows. Now watches `document.body` so the injection fires regardless of where WP mounts the view.
+* Fix: Theme card link is now `float: right` inside `.theme-actions` so it sits opposite the Customize button on the dark footer bar instead of crowding it.
+* Internal: The single-theme view doesn't carry a data-slug attribute, so identification is now done by matching the `.theme-name <h2>` text content (stripped of "Active:" / "Version: X.Y.Z" prefixes/suffixes) against the theme's Name from style.css.
 
 = 1.0.4 =
 * New: Theme owns its own admin UI for the update system. inc/class-update-ui.php renders the "Check for updates" link on the theme card (Appearance → Themes) and adds a collapsible Changelog section to WP's Theme Details overlay. Reads data via Core's new manifest() and get_force_check_url() public API rather than having Core inject the markup itself. Pairs with estatesite-wpcore v1.0.7 which strips the theme-specific code out of Update_Checker.
