@@ -182,18 +182,26 @@ final class Update_UI {
 					nameEl.appendChild(makeLink());
 				}
 
-				// 2. Collapsible Changelog <details> — modal only.
+				// 2. Collapsible Changelog <details> — modal only AND visible.
 				//
-				// We only inject the changelog block when the root is
-				// `.theme-overlay` (WP's modal lightbox, opened by clicking
-				// "Theme Details" on a card). This mirrors WP's plugin pattern:
-				// plugin changelogs only appear in the plugin info modal, not in
-				// the inline plugin list / single-plugin views. The
-				// `.single-theme` and `.theme-wrap` variants stay clean —
-				// they're closer to inline views than to a modal.
-				var isModal = root.classList.contains('theme-overlay') ||
-				              root.closest('.theme-overlay') !== null;
-				if (isModal && changelogHtml && !root.querySelector('.esc-theme-changelog')) {
+				// WP renders `<div class="theme-overlay">` empty on every
+				// themes.php load (it's the modal mount point) and ALSO renders
+				// `.theme-wrap` Backbone-style when the modal opens. We must
+				// only inject when:
+				//   a) The root is the .theme-overlay itself (not nested
+				//      .theme-wrap, which causes a duplicate injection pass), AND
+				//   b) The overlay is actually OPEN (Backbone toggles
+				//      offsetParent — display:none elements have offsetParent
+				//      null, while visible ones have a real ancestor).
+				//
+				// This mirrors WP's plugin pattern: plugin changelogs appear only
+				// inside the plugin info lightbox, not on the plugins.php list
+				// page itself.
+				var isOverlayRoot = root.classList.contains('theme-overlay');
+				var overlay = isOverlayRoot ? root : root.closest('.theme-overlay');
+				var isModalOpen = overlay && overlay.offsetParent !== null;
+				if (isOverlayRoot && isModalOpen && changelogHtml &&
+				    !overlay.querySelector('.esc-theme-changelog')) {
 					var details = document.createElement('details');
 					details.className = 'esc-theme-changelog';
 					var summary = document.createElement('summary');
