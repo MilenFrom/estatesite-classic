@@ -9,16 +9,18 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ESC_THEME_VERSION', '1.0.2' );
+define( 'ESC_THEME_VERSION', '1.0.3' );
 define( 'ESC_THEME_DIR',     get_template_directory() );
 define( 'ESC_THEME_URL',     get_template_directory_uri() );
 
 // ---------------------------------------------------------------------------
 // Update pipeline — native WP filter pointing at our own JSON manifest.
 // Uses the Update_Checker class from EstateSite Core (hard dependency).
-// Defer registration to plugins_loaded so Core's class is available.
+// Themes load AFTER plugins_loaded fires, so we can't hook plugins_loaded
+// from here — by the time functions.php runs, it's already passed.
+// Use after_setup_theme instead, which fires once functions.php has loaded.
 // ---------------------------------------------------------------------------
-add_action( 'plugins_loaded', static function () {
+add_action( 'after_setup_theme', static function () {
 	if ( ! class_exists( '\EstateSite\Core\Update_Checker' ) ) {
 		return; // Core missing — theme dep check below will surface this.
 	}
@@ -30,7 +32,7 @@ add_action( 'plugins_loaded', static function () {
 			? ESTATESITE_UPDATE_ENDPOINT_CLASSIC
 			: 'https://dev.estatesite.eu/updates/estatesite-classic.json'
 	);
-}, 6 );
+} );
 
 /*
  * Houzez constants aliased to our theme paths so ported templates resolve
