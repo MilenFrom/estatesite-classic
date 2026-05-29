@@ -2,20 +2,18 @@
 /**
  * Theme-side admin UI for the update system.
  *
- * Renders:
- *   1. "Check for updates" link on the theme card (Appearance → Themes)
- *   2. "Check for updates" link in the Theme Details overlay
- *   3. Collapsible Changelog block in the Theme Details overlay
+ * Renders the "Check for updates" link inside WP's Theme Details view
+ * (next to the theme name).
  *
  * Pulls data + URLs from the EstateSite Core Update_Checker instance the
  * theme created in functions.php. Core owns the generic update infrastructure
  * (manifest polling, transient injection, force-check handler, recovery URL).
  * This class owns ONLY presentation.
  *
- * WP has no theme_action_links filter equivalent of plugin_action_links, and
- * no themes_api equivalent of plugins_api's "View details" lightbox. We work
- * around both with an inline JS+CSS shim emitted via the themes.php footer
- * hook.
+ * The Changelog block experiment (v1.0.4-1.0.8) was removed in v1.0.9 —
+ * fighting WP's modal/single-theme/theme-wrap DOM variants caused more
+ * trouble than the feature was worth. Customers can read the changelog
+ * via the GitHub release page or the manifest JSON.
  *
  * @package EstateSite\Classic
  */
@@ -37,39 +35,29 @@ final class Update_UI {
 	}
 
 	/**
-	 * Render the inline CSS + JS shim. Fires once per themes.php load.
-	 *
-	 * WP renders theme cards client-side via Backbone, so a one-shot
-	 * DOMContentLoaded listener races the render. We use a MutationObserver
-	 * that watches the themes container and inserts the link whenever our
-	 * card appears — covers initial render, filter changes, search, and
-	 * pagination.
+	 * Emit the inline CSS + JS shim that injects the "Check for updates" link
+	 * into WP's Theme Details view (any container — .theme-overlay,
+	 * .single-theme, .theme-wrap — all render the same .theme-info structure).
 	 */
 	public function render(): void {
-		$slug            = $this->checker->get_slug();
-		$href            = $this->checker->get_force_check_url();
-		$manifest        = $this->checker->manifest();
-		$changelog_html  = $manifest['sections']['changelog'] ?? '';
+		$slug        = $this->checker->get_slug();
+		$href        = $this->checker->get_force_check_url();
 
-		// Theme name from style.css — used by the single-theme view injection
-		// to identify our theme by matching the .theme-name h2 text (that view
-		// doesn't carry a data-slug attribute).
-		$theme           = wp_get_theme( $slug );
-		$theme_name      = $theme->get( 'Name' );
+		// Theme name from style.css — used by the JS to identify our theme by
+		// matching the .theme-name h2 text content (the Theme Details view
+		// doesn't carry a data-slug attribute on its root container).
+		$theme       = wp_get_theme( $slug );
+		$theme_name  = $theme->get( 'Name' );
 
 		// All values that flow into JS string literals go through wp_json_encode
-		// so the embedded URL keeps real ampersands (esc_js HTML-encodes them
-		// to &amp;, which breaks the nonce on click).
-		$slug_json            = wp_json_encode( $slug );
-		$name_json            = wp_json_encode( $theme_name );
-		$href_json            = wp_json_encode( $href );
-		$label_json           = wp_json_encode( __( 'Check for updates', 'estatesite-classic' ) );
-		$changelog_json       = wp_json_encode( $changelog_html );
-		$changelog_label_json = wp_json_encode( __( 'Changelog', 'estatesite-classic' ) );
+		// so the embedded URL keeps real ampersands (esc_js HTML-encodes them to
+		// &amp;, which breaks the nonce on click).
+		$slug_json   = wp_json_encode( $slug );
+		$name_json   = wp_json_encode( $theme_name );
+		$href_json   = wp_json_encode( $href );
+		$label_json  = wp_json_encode( __( 'Check for updates', 'estatesite-classic' ) );
 		?>
 		<style>
-			/* Theme Details view link — sits next to the h2 .theme-name in any
-			   of WP's three layouts for that view. */
 			.theme-overlay .theme-info .theme-name .esc-check-updates,
 			.single-theme .theme-info .theme-name .esc-check-updates,
 			.theme-wrap .theme-info .theme-name .esc-check-updates {
@@ -86,49 +74,13 @@ final class Update_UI {
 			.theme-wrap .theme-info .theme-name .esc-check-updates:hover {
 				color: #135e96;
 			}
-			.esc-theme-changelog {
-				margin-top: 24px;
-				padding-top: 20px;
-				border-top: 1px solid #dcdcde;
-			}
-			.esc-theme-changelog summary {
-				font-weight: 600;
-				font-size: 14px;
-				cursor: pointer;
-				color: #1d2327;
-				padding: 6px 0;
-				outline: none;
-			}
-			.esc-theme-changelog summary:hover { color: #135e96; }
-			.esc-theme-changelog[open] summary { margin-bottom: 12px; }
-			.esc-theme-changelog .esc-changelog-body { font-size: 13px; line-height: 1.6; }
-			.esc-theme-changelog .esc-changelog-body h4 {
-				margin: 16px 0 6px;
-				font-size: 14px;
-				color: #1d2327;
-			}
-			.esc-theme-changelog .esc-changelog-body h4:first-child { margin-top: 0; }
-			.esc-theme-changelog .esc-changelog-body ul {
-				margin: 0 0 10px 18px;
-				padding: 0;
-				list-style: disc;
-			}
-			.esc-theme-changelog .esc-changelog-body li { margin-bottom: 4px; }
-			.esc-theme-changelog .esc-changelog-body code {
-				background: #f0f0f1;
-				padding: 1px 5px;
-				border-radius: 2px;
-				font-size: 12px;
-			}
 		</style>
 		<script>
 		(function () {
-			var slug           = <?php echo $slug_json; ?>;
-			var themeName      = <?php echo $name_json; ?>;
-			var href           = <?php echo $href_json; ?>;
-			var label          = <?php echo $label_json; ?>;
-			var changelogHtml  = <?php echo $changelog_json; ?>;
-			var changelogLabel = <?php echo $changelog_label_json; ?>;
+			var slug      = <?php echo $slug_json; ?>;
+			var themeName = <?php echo $name_json; ?>;
+			var href      = <?php echo $href_json; ?>;
+			var label     = <?php echo $label_json; ?>;
 
 			function makeLink() {
 				var link = document.createElement('a');
@@ -138,96 +90,41 @@ final class Update_UI {
 				return link;
 			}
 
-			// (Theme card injection deliberately omitted. The link is shown only
-			// inside the Theme Details view — the card footer is reserved for
-			// WP's own actions (Customize / Activate / Live Preview) to keep
-			// the layout uncluttered.)
-
-			function injectIntoModal() {
-				// WP renders the "Theme Details" view in two slightly different
-				// layouts depending on flow:
-				//   - `.theme-overlay`           — modal overlay over the grid
-				//                                  (click "Theme Details" on a card)
-				//   - `.themes.single-theme`     — full-page replacement when the
-				//                                  grid is filtered to one theme
-				//
-				// Both render the same Backbone template (tmpl-theme-single) with
-				// .theme-info containing .theme-name, so we look up the rendered
-				// view as a single root then identify our theme by matching the
-				// name in the .theme-name <h2> (the active theme's data-slug
-				// attribute isn't on this view).
+			function tryInject() {
+				// WP's Theme Details view renders the same tmpl-theme-single
+				// Backbone template under three possible containers depending on
+				// flow: .theme-overlay (modal), .single-theme (full-page filter
+				// view), .theme-wrap (direct render). Match any of them.
 				var roots = document.querySelectorAll('.theme-overlay, .single-theme, .theme-wrap');
 				for (var i = 0; i < roots.length; i++) {
-					tryInjectInfo(roots[i]);
-				}
-			}
+					var root = roots[i];
+					if (root.querySelector('.esc-check-updates')) continue;
 
-			function tryInjectInfo(root) {
-				if (!root) return;
-				var info = root.querySelector('.theme-info');
-				if (!info) return;
-				// Only inject when this view is showing OUR theme. The view
-				// doesn't carry a data-slug, so we match against the h2.theme-name
-				// text content (stripped of "Active:" / "Version: x.y.z" labels).
-				var nameEl = info.querySelector('.theme-name');
-				if (!nameEl) return;
-				var nameText = nameEl.textContent
-					.replace(/Active:\s*/, '')
-					.replace(/Version:\s*\S+\s*$/, '')
-					.trim();
-				if (nameText.toLowerCase() !== themeName.toLowerCase()) return;
+					var info = root.querySelector('.theme-info');
+					if (!info) continue;
 
-				// 1. "Check for updates" link next to .theme-name
-				if (!root.querySelector('.esc-check-updates')) {
+					var nameEl = info.querySelector('.theme-name');
+					if (!nameEl) continue;
+
+					// Identify our theme by .theme-name text content (stripped of
+					// "Active:" / "Version: X.Y.Z" prefixes/suffixes WP injects).
+					var nameText = nameEl.textContent
+						.replace(/Active:\s*/, '')
+						.replace(/Version:\s*\S+\s*$/, '')
+						.trim();
+					if (nameText.toLowerCase() !== themeName.toLowerCase()) continue;
+
 					nameEl.appendChild(makeLink());
 				}
-
-				// 2. Collapsible Changelog <details> — modal only AND visible.
-				//
-				// WP renders `<div class="theme-overlay">` empty on every
-				// themes.php load (it's the modal mount point) and ALSO renders
-				// `.theme-wrap` Backbone-style when the modal opens. We must
-				// only inject when:
-				//   a) The root is the .theme-overlay itself (not nested
-				//      .theme-wrap, which causes a duplicate injection pass), AND
-				//   b) The overlay is actually OPEN (Backbone toggles
-				//      offsetParent — display:none elements have offsetParent
-				//      null, while visible ones have a real ancestor).
-				//
-				// This mirrors WP's plugin pattern: plugin changelogs appear only
-				// inside the plugin info lightbox, not on the plugins.php list
-				// page itself.
-				var isOverlayRoot = root.classList.contains('theme-overlay');
-				var overlay = isOverlayRoot ? root : root.closest('.theme-overlay');
-				var isModalOpen = overlay && overlay.offsetParent !== null;
-				if (isOverlayRoot && isModalOpen && changelogHtml &&
-				    !overlay.querySelector('.esc-theme-changelog')) {
-					var details = document.createElement('details');
-					details.className = 'esc-theme-changelog';
-					var summary = document.createElement('summary');
-					summary.textContent = changelogLabel;
-					var body = document.createElement('div');
-					body.className = 'esc-changelog-body';
-					body.innerHTML = changelogHtml; // pre-sanitized server-side (h4/ul/li/strong/code only)
-					details.appendChild(summary);
-					details.appendChild(body);
-					info.appendChild(details);
-				}
 			}
 
-			function tryNow() {
-				injectIntoModal();
-			}
+			if (document.readyState !== 'loading') tryInject();
+			else document.addEventListener('DOMContentLoaded', tryInject);
+			window.addEventListener('load', tryInject);
 
-			if (document.readyState !== 'loading') tryNow();
-			else document.addEventListener('DOMContentLoaded', tryNow);
-			window.addEventListener('load', tryNow);
-
-			// Observe the entire body for DOM changes. When the user clicks
-			// "Theme Details" on a card, WP injects the .theme-wrap markup
-			// somewhere under .wrap (or directly under body for the overlay),
-			// not necessarily inside .themes. Watching body catches both.
-			var observer = new MutationObserver(function () { tryNow(); });
+			// Observe body for Backbone re-renders (modal open/close, theme
+			// switches via arrow buttons, filter / search / pagination).
+			var observer = new MutationObserver(function () { tryInject(); });
 			observer.observe(document.body, { childList: true, subtree: true });
 		})();
 		</script>

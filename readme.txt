@@ -4,7 +4,7 @@ Tags: real estate, property listings, blog, two-columns, right-sidebar, custom-m
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,9 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
+
+= 1.0.9 =
+* Remove: Changelog `<details>` block experiment removed entirely. Across v1.0.4 → v1.0.8 each fix to the WP-DOM gate introduced a new edge case in another container variant. The feature wasn't worth the maintenance — customers can read changelogs at https://github.com/MilenFrom/estatesite-classic/releases or via the manifest JSON at https://dev.estatesite.eu/updates/estatesite-classic.json. inc/class-update-ui.php now only injects the "Check for updates" link (the actionable part) and is half the size.
 
 = 1.0.8 =
 * Fix: Changelog `<details>` block could appear in the wrong context (or duplicate) because the gate logic didn't distinguish between (a) the .theme-overlay mount point WP pre-renders empty on every themes.php load and (b) the .theme-overlay that's actually open with content inside. Now uses offsetParent !== null to detect "modal is visible" — handles WP's display:none toggling — AND restricts injection to roots that ARE the .theme-overlay itself (not nested .theme-wrap inside it, which was causing a duplicate injection pass).
