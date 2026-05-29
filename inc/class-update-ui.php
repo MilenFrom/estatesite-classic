@@ -182,8 +182,18 @@ final class Update_UI {
 					nameEl.appendChild(makeLink());
 				}
 
-				// 2. Collapsible Changelog <details> at the bottom of .theme-info
-				if (changelogHtml && !root.querySelector('.esc-theme-changelog')) {
+				// 2. Collapsible Changelog <details> — modal only.
+				//
+				// We only inject the changelog block when the root is
+				// `.theme-overlay` (WP's modal lightbox, opened by clicking
+				// "Theme Details" on a card). This mirrors WP's plugin pattern:
+				// plugin changelogs only appear in the plugin info modal, not in
+				// the inline plugin list / single-plugin views. The
+				// `.single-theme` and `.theme-wrap` variants stay clean —
+				// they're closer to inline views than to a modal.
+				var isModal = root.classList.contains('theme-overlay') ||
+				              root.closest('.theme-overlay') !== null;
+				if (isModal && changelogHtml && !root.querySelector('.esc-theme-changelog')) {
 					var details = document.createElement('details');
 					details.className = 'esc-theme-changelog';
 					var summary = document.createElement('summary');
