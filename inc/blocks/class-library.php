@@ -51,9 +51,9 @@ class Houzez_Library
 
 	public function enqueue()
 	{
-		// Version bumped to 1.1.0-es so customer browser caches reload the
+		// Version bumped to 1.2.0-es so customer browser caches reload the
 		// patched URLs (was 1.0.1 hardcoded to studio.houzez.co).
-		wp_enqueue_script('houzez-blocks', get_template_directory_uri() . '/inc/blocks/assets/js/blocks-templates.js', array('jquery'), '1.1.0-es', true);
+		wp_enqueue_script('houzez-blocks', get_template_directory_uri() . '/inc/blocks/assets/js/blocks-templates.js', array('jquery'), '1.2.0-es', true);
 
 		// EstateSite-native source: when the EstateSite Templates class is
 		// loaded (from estatesite-wpelementor), point the library JS at our
@@ -64,11 +64,15 @@ class Houzez_Library
 		$json_version       = (string) time();
 		$all_templates_url  = '';
 		$template_url_template = '';
+		$proxy_url          = '';
+		$nonce_x            = '';
 
 		if ( class_exists( '\\EstateSite\\Elementor\\Templates' ) ) {
-			$json_base_url         = rest_url( 'estatesite/v1/templates/by-slug/' );
-			$all_templates_url     = rest_url( 'estatesite/v1/templates' );
-			$template_url_template = $json_base_url . '{slug}';
+			$all_templates_url     = \EstateSite\Elementor\Templates::manifest_url();
+			$json_base_url         = \EstateSite\Elementor\Templates::library_url() . '/by-slug/';
+			$template_url_template = \EstateSite\Elementor\Templates::library_url() . '/by-slug/{slug}';
+			$proxy_url             = \EstateSite\Elementor\Templates::proxy_endpoint_url();
+			$nonce_x               = wp_create_nonce( 'wp_rest' );
 			$use_json_files        = true;
 		}
 		// Fallback for sites still running favethemes-api (Houzez compat).
@@ -92,6 +96,8 @@ class Houzez_Library
 			'nonce' => wp_create_nonce('houzez_library_nonce'),
 			'is_activated' => houzez_is_license_activated(),
 			'license_url' => admin_url('admin.php?page=favethemes-license'),
+			'proxy_url' => $proxy_url,
+			'nonce_x'   => $nonce_x,
 			'json_files' => array(
 				'enabled' => $use_json_files,
 				'base_url' => $json_base_url,

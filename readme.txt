@@ -4,7 +4,7 @@ Tags: real estate, property listings, blog, two-columns, right-sidebar, custom-m
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.12
+Stable tag: 1.0.13
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,14 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
+
+= 1.0.13 =
+* Fix: Elementor template library bridge would 404 on customer sites because the manifest fetch hit the customer's own domain instead of dev.estatesite.eu. The library JS now fetches the manifest cross-origin (crossDomain:true, withCredentials:false) using `\EstateSite\Elementor\Templates::manifest_url()` / `library_url()`, so the same install of EstateSite Elementor can serve templates to any customer site without per-site manifest mirroring.
+* Fix: Insert action in the template picker used to fetch the raw template JSON directly from dev.estatesite.eu and inject it into Elementor — which broke under the customer site's CSP and lost the WP user context. Now POSTs to the customer-side sideload proxy with `X-WP-Nonce`, so the template is imported through the customer's own REST stack (proper attribution, attachments imported into the customer's media library, CSP-clean).
+* Remove: All remaining `studio.houzez.co` fallback URLs (template thumbnails, kit demo URLs, sample manifest). These dated from the Houzez fork and were silently used as a "last resort" CDN when the EstateSite manifest was unreachable — exposing customers to a third-party domain we don't control. The library now fails cleanly with an in-UI error instead.
+* Fix: Deactivating EstateSite Elementor used to fatal the theme because several template-parts and theme-builder hooks called `\EstateSite\Elementor\Templates::*` statically without checking whether the class existed. Every such call is now guarded behind `class_exists('\EstateSite\Elementor\Templates')` so the theme degrades to the native (non-Elementor) header/footer path instead of WSOD-ing the admin.
+* Bump: Script version for the Elementor library bridge to `1.2.0-es` to bust browser cache after the cross-origin + sideload-proxy rewrite. Customers may still need one hard refresh (Ctrl+Shift+R) on the Elementor editor.
+* Pairs with: EstateSite Elementor 1.0.3 (server-side sideload proxy + CORS headers on the manifest endpoint). Updating only one half of the pair will leave the template library broken — update both.
 
 = 1.0.12 =
 * Fix: Footer widget areas were silently dropped. `template-parts/footer/footer.php` opens with `if (!is_active_sidebar('footer-sidebar-1') && ... ) return;` — but the v1.0.10 sidebar port missed all four `footer-sidebar-1..4` IDs. Since unregistered sidebars can never report active, the guard returned every time and the entire footer widget area was hidden, with no drop targets in Appearance → Widgets. Now registers all four with Houzez's distinct `footer-widget` before_widget class so customers can populate footer columns.

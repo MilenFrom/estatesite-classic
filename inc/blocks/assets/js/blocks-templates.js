@@ -72,21 +72,23 @@
             showLoader();
 
             // EstateSite: use localized URL (points at our REST endpoint).
-            // Falls back to studio.houzez.co only if no local URL was set.
+            // Falls back to dev.estatesite.eu manifest only if no local URL was set.
             const localUrl = houzez_library_ajax.json_files && houzez_library_ajax.json_files.all_templates_url
                 ? houzez_library_ajax.json_files.all_templates_url
                 : '';
             const jsonUrl = localUrl
                 ? localUrl + (localUrl.indexOf('?') !== -1 ? '&' : '?') + 'v=' + Date.now()
-                : 'https://studio.houzez.co/wp-content/uploads/houzez-studio-files/all-templates.json?v=' + Date.now();
+                : 'https://dev.estatesite.eu/wp-json/estatesite/v1/templates?v=' + Date.now();
 
-            console.log('📚 Houzez Library: Loading templates from JSON file:', jsonUrl);
+            console.log('📚 EstateSite Library: Loading templates from JSON file:', jsonUrl);
 
             $.ajax({
                 url: jsonUrl,
                 method: 'GET',
                 dataType: 'json',
                 cache: false,
+                crossDomain: true,
+                xhrFields: { withCredentials: false },
                 success: function (response) {
                     if (
                         response &&
@@ -112,11 +114,11 @@
 
                     if (xhr.status === 0) {
                         console.error('❌ CORS or network error loading all-templates.json');
-                        console.error('💡 Ensure CORS headers are properly configured on studio.houzez.co');
+                        console.error('💡 Ensure CORS headers are properly configured on dev.estatesite.eu');
                         errorMessage = 'Network or CORS error. Check console for details.';
                     } else if (xhr.status === 404) {
                         console.error('❌ all-templates.json not found (404)');
-                        console.error('💡 Run "Generate JSON Files" in the Favethemes API settings');
+                        console.error('💡 Verify the EstateSite Templates manifest is reachable on dev.estatesite.eu');
                         errorMessage = 'Template file not found. Generate JSON files first.';
                     } else if (xhr.status >= 500) {
                         console.error(`❌ Server error (${xhr.status})`);
@@ -234,7 +236,10 @@
             return null;
         }
 
-        // Import single template from JSON file
+        // Import single template via the EstateSite proxy endpoint.
+        // The proxy fetches the upstream JSON, sideloads images, and returns
+        // the normalized template payload — we never hit the remote library
+        // directly from the editor.
         function importSingleTemplate(templateId) {
             showLoader();
 
@@ -247,27 +252,38 @@
                 return;
             }
 
-            // EstateSite: use localized template URL template if available.
-            const tplTemplate = houzez_library_ajax.json_files && houzez_library_ajax.json_files.template_url_template
-                ? houzez_library_ajax.json_files.template_url_template
-                : '';
-            const jsonUrl = tplTemplate
-                ? tplTemplate.replace('{slug}', encodeURIComponent(templateSlug)) + '?v=' + Date.now()
-                : `https://studio.houzez.co/wp-content/uploads/houzez-studio-files/${templateSlug}.json?v=${Date.now()}`;
+            const proxyUrl = houzez_library_ajax.proxy_url || '';
 
-            console.log(`📄 Loading template from JSON file: ${jsonUrl}`);
+            if (!proxyUrl) {
+                console.error('❌ Proxy endpoint URL is not configured');
+                showError('Template proxy endpoint not configured.');
+                hideLoader();
+                return;
+            }
+
+            console.log(`📄 Importing template via proxy: ${templateSlug}`);
 
             $.ajax({
-                url: jsonUrl,
-                method: 'GET',
+                url: proxyUrl,
+                method: 'POST',
                 dataType: 'json',
                 cache: false,
-                success: function(templateData) {
-                    if (templateData && templateData.content && Array.isArray(templateData.content)) {
-                        console.log(`✅ Template loaded from JSON file: ${templateSlug}`);
+                headers: {
+                    'X-WP-Nonce': houzez_library_ajax.nonce_x || '',
+                },
+                data: { slug: templateSlug },
+                success: function(response) {
+                    // WP REST endpoints sometimes wrap payloads in `data`,
+                    // while raw handlers return the payload directly.
+                    const payload = (response && response.data && typeof response.data === 'object')
+                        ? response.data
+                        : response;
+
+                    if (payload && payload.content && Array.isArray(payload.content)) {
+                        console.log(`✅ Template imported via proxy: ${templateSlug}`);
 
                         // Process the template content for Elementor
-                        const processedContent = processTemplateContent(templateData.content);
+                        const processedContent = processTemplateContent(payload.content);
 
                         // Add to Elementor
                         elementor.getPreviewView().addChildModel(processedContent);
@@ -279,7 +295,7 @@
 
                         // Show success notification
                         $(
-                            '<div class="houzez-notice houzez-success">✅ Template loaded from JSON file</div>'
+                            '<div class="houzez-notice houzez-success">✅ Template imported</div>'
                         )
                             .prependTo(
                                 $(
@@ -289,7 +305,7 @@
                             .delay(3000)
                             .fadeOut();
                     } else {
-                        console.error('Invalid JSON template structure');
+                        console.error('Invalid proxy template payload', response);
                         showError('Invalid template data.');
                         hideLoader();
                     }
@@ -299,21 +315,21 @@
                     let errorType = 'generic';
 
                     if (xhr.status === 0) {
-                        errorMessage = 'CORS error or network failure';
-                        errorType = 'cors';
-                        console.error(`❌ CORS or network error loading JSON: ${jsonUrl}`);
+                        errorMessage = 'Network failure';
+                        errorType = 'network';
+                        console.error(`❌ Network error contacting proxy: ${proxyUrl}`);
                     } else if (xhr.status === 404) {
-                        errorMessage = 'JSON file not found (404)';
+                        errorMessage = 'Template not found (404)';
                         errorType = '404';
-                        console.warn(`⚠️ JSON file not found (404): ${jsonUrl}`);
+                        console.warn(`⚠️ Template not found via proxy (404): ${templateSlug}`);
                     } else if (xhr.status >= 500) {
                         errorMessage = `Server error (${xhr.status})`;
                         errorType = 'server';
-                        console.error(`❌ Server error loading JSON: ${jsonUrl}`);
+                        console.error(`❌ Server error from proxy: ${proxyUrl}`);
                     } else {
                         errorMessage = `HTTP error ${xhr.status}`;
                         errorType = 'http';
-                        console.warn(`⚠️ HTTP error loading JSON: ${jsonUrl}`);
+                        console.warn(`⚠️ HTTP error from proxy: ${proxyUrl}`);
                     }
 
                     showError(`Failed to load template: ${errorMessage}`);
