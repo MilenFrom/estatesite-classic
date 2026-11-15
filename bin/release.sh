@@ -116,7 +116,18 @@ rsync -a \
   --exclude='.DS_Store' \
   --exclude='Thumbs.db' \
   --exclude='RELEASE_NOTES_v*.md' \
+  --exclude='CLAUDE.md' \
   ./ "$DIST_DIR/"
+
+# Internal notes never ship. CLAUDE.md describes fixes (security ones included) in
+# detail, and a file in a theme or plugin folder can be downloaded by anyone who
+# knows its address (nginx serves .md files). Fail the build if one gets through.
+LEAKED_NOTES=$(find "$DIST_DIR" -name 'CLAUDE.md' -print)
+if [ -n "$LEAKED_NOTES" ]; then
+  echo "ERROR: internal notes would ship in the zip:" >&2
+  echo "$LEAKED_NOTES" >&2
+  exit 1
+fi
 
 # Build zip inside the temp dir so the top-level entry is $PACKAGE_SLUG/
 ( cd "$WORK_DIR" && zip -qr "$ZIP_NAME" "$PACKAGE_SLUG" )
