@@ -73,7 +73,7 @@ add_action( 'after_switch_theme', function () {
 	if ( ! defined( 'ESCORE_VERSION' ) ) {
 		switch_theme( WP_DEFAULT_THEME ?: 'twentytwentyfour' );
 		wp_die(
-			esc_html__( 'EstateSite Classic requires the EstateSite Core plugin to be active. Please activate it first, then re-activate this theme.', 'estatesite-classic' ),
+			esc_html__( 'EstateSite Classic requires the EstateSite HouzezCore plugin to be active. Please activate it first, then re-activate this theme.', 'estatesite-classic' ),
 			esc_html__( 'Missing Dependency', 'estatesite-classic' ),
 			[ 'back_link' => true ]
 		);
@@ -86,7 +86,7 @@ add_action( 'after_switch_theme', function () {
 add_action( 'admin_notices', function () {
 	if ( ! defined( 'ESCORE_VERSION' ) ) {
 		echo '<div class="notice notice-error"><p>'
-			. esc_html__( 'EstateSite Classic is active but EstateSite Core plugin is not. Most features will not work until Core is reactivated.', 'estatesite-classic' )
+			. esc_html__( 'EstateSite Classic is active but EstateSite HouzezCore plugin is not. Most features will not work until Core is reactivated.', 'estatesite-classic' )
 			. '</p></div>';
 	}
 } );

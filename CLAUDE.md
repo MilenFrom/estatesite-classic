@@ -10,6 +10,7 @@ Phase 0 scaffold. Minimal functional templates. Stylesheet is presentable, not d
 - **Class prefix**: `ESC_`
 - **Constants**: `ESC_THEME_VERSION`, `ESC_THEME_DIR`, `ESC_THEME_URL`
 - **Hard dependency**: EstateSite Core plugin. Theme refuses to activate without it.
+- **Update pipeline**: native WP filter reads manifest JSON from `https://dev.estatesite.eu/updates/estatesite-classic.json`, downloads zip from same server. Uses the `\EstateSite\Core\Update_Checker` class from Core. See [plugins-release-docs.md](../../../../dev-private/docs/plugins-release-docs.md) (in `htdocs/dev-private/docs/`, outside the web root).
 
 ## Files of note
 

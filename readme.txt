@@ -8,16 +8,16 @@ Stable tag: 1.0.13
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-EstateSite Classic — WordPress theme for real estate sites. Pairs with the EstateSite Core plugin.
+EstateSite Classic — WordPress theme for real estate sites. Pairs with the EstateSite HouzezCore plugin.
 
 == Description ==
 
-EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual layer for EstateSite Core. The plugin owns all data logic (CPTs, search, agents, options); the theme owns presentation (headers, footers, archive grids, single-property layouts).
+EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual layer for EstateSite HouzezCore. The plugin owns all data logic (CPTs, search, agents, options); the theme owns presentation (headers, footers, archive grids, single-property layouts).
 
 * 64 page-templates (Search Results, Property Half Map, listing grids v1-v7, listing lists, dashboard, login, packages, agencies, agents)
 * Full template-parts/ tree (header variants, footer variants, listing cards, dashboard widgets, search forms)
 * property-details/ subtree for single-property layout variants
-* Hard depends on EstateSite Core plugin
+* Hard depends on EstateSite HouzezCore plugin
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
@@ -86,5 +86,5 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * inc/class-theme.php for theme bootstrap (image sizes, menus, supports, sidebars).
 * inc/register-scripts.php (790 lines, ported from Houzez inc/) for asset enqueuing.
 * inc/styling-options.php for dynamic CSS based on customizer options.
-* Hard dependency on EstateSite Core plugin (validated at after_switch_theme).
+* Hard dependency on EstateSite HouzezCore plugin (validated at after_switch_theme).
 * Update pipeline via \EstateSite\Core\Update_Checker — manifest at https://dev.estatesite.eu/updates/estatesite-classic.json.
