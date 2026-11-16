@@ -4,7 +4,7 @@ Tags: real estate, property listings, blog, two-columns, right-sidebar, custom-m
 Requires at least: 6.4
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.13
+Stable tag: 1.0.14
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,10 @@ EstateSite Classic is a fork of the Houzez 4.1.6 theme rebuilt as the visual lay
 * Self-hosted updates via the EstateSite update server (no third-party services)
 
 == Changelog ==
+
+= 1.0.14 =
+* Change: The plugin this theme needs is now called **EstateSite HouzezCore** (formerly EstateSite Core). The theme's description, readme and the two messages shown when the plugin is missing (when switching to the theme, and in wp-admin) use the new name. It is the same plugin with the same folder name, so nothing needs reinstalling; the Plugins screen shows the new name once the plugin's own update arrives.
+* Internal: The package no longer includes the developers' internal notes file.
 
 = 1.0.13 =
 * Fix: Elementor template library bridge would 404 on customer sites because the manifest fetch hit the customer's own domain instead of dev.estatesite.eu. The library JS now fetches the manifest cross-origin (crossDomain:true, withCredentials:false) using `\EstateSite\Elementor\Templates::manifest_url()` / `library_url()`, so the same install of EstateSite Elementor can serve templates to any customer site without per-site manifest mirroring.
